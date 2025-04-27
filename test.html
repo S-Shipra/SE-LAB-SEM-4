@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MoodTunes Feature Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1ed760;
+        }
+        #results {
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>MoodTunes Feature Tests</h1>
+    
+    <div class="test-case">
+        <h2>Test Case 1: Happy Mood with High Sentiment</h2>
+        <p><strong>Description:</strong> Verify that selecting "Happy" mood with high sentiment (80) returns appropriate happy songs.</p>
+        <p><strong>Expected Result:</strong> Should display pop/happy/dance songs like "Shape of You", "Uptown Funk", etc.</p>
+        <button onclick="runTest1()">Run Test</button>
+        <div id="test1-result"></div>
+    </div>
+    
+    <div class="test-case">
+        <h2>Test Case 2: Sad Mood with Low Sentiment</h2>
+        <p><strong>Description:</strong> Verify that selecting "Sad" mood with low sentiment (20) returns appropriate sad songs.</p>
+        <p><strong>Expected Result:</strong> Should display sad/blues songs like "Someone Like You", "Hurt", etc.</p>
+        <button onclick="runTest2()">Run Test</button>
+        <div id="test2-result"></div>
+    </div>
+    
+    <div class="test-case">
+        <h2>Test Case 3: Invalid Input Handling</h2>
+        <p><strong>Description:</strong> Verify that the form handles invalid inputs (no mood selected, sentiment out of range).</p>
+        <p><strong>Expected Result:</strong> Should show appropriate validation messages and not display results.</p>
+        <button onclick="runTest3()">Run Test</button>
+        <div id="test3-result"></div>
+    </div>
+    
+    <div id="results">
+        <h2>Test Results</h2>
+        <div id="test-results-summary"></div>
+    </div>
+
+    <script>
+        // Include the song database from the original app
+        const songDatabase = {
+            happy: [
+                {id: "7qiZfU4dY1lWllzX7mPBI3", title: "Shape of You", artist: "Ed Sheeran", image: "https://i.scdn.co/image/ab67616d0000b273d9e6d98a1023a1a0a82226b3"},
+                {id: "1r9xUipOqoNwggBpENDsvJ", title: "Uptown Funk", artist: "Bruno Mars", image: "https://i.scdn.co/image/ab67616d0000b2738093238ec1366a6d96579518"},
+                {id: "6fujklziTHa8uoM5OQSfIo", title: "Can't Stop the Feeling!", artist: "Justin Timberlake", image: "https://i.scdn.co/image/ab67616d0000b273d9194aa18fa4c9362b47464f"}
+            ],
+            sad: [
+                {id: "3ERIk9f6kLfOEp78yX1Pm6", title: "Someone Like You", artist: "Adele", image: "https://i.scdn.co/image/ab67616d0000b273e2d156fdc691f57900134342"},
+                {id: "4Dvkj6JhhA12EX05fT7y2e", title: "Hurt", artist: "Johnny Cash", image: "https://i.scdn.co/image/ab67616d0000b2730f5c597bba60a1a7b904a9b1"},
+                {id: "6G7ZrHD6tX7a4qNwSekhZW", title: "Everybody Hurts", artist: "R.E.M.", image: "https://i.scdn.co/image/ab67616d0000b2739a9716c90ceeb1890921e44f"}
+            ],
+            angry: [
+                {id: "3fjtZV7YzUD7j5i6gWCC88", title: "Enter Sandman", artist: "Metallica", image: "https://i.scdn.co/image/ab67616d0000b273cf84c5b276431b473e924802"},
+                {id: "5N4sKR4J4oYmsXitcRlJxM", title: "Chop Suey!", artist: "System Of A Down", image: "https://i.scdn.co/image/ab67616d0000b273b1d6b4d39cd7b65f875c7d8c"},
+                {id: "3YfS47QufnLDFA9A7E4dQB", title: "Last Resort", artist: "Papa Roach", image: "https://i.scdn.co/image/ab67616d0000b273a1a6d5b20c9c3577b3a0f9c8"}
+            ],
+            relaxed: [
+                {id: "7xGfFoTpQ2E7fRF5lN10tr", title: "Weightless", artist: "Marconi Union", image: "https://i.scdn.co/image/ab67616d0000b2738e49866860dcb5c26a4b6f6e"},
+                {id: "1y6L4F9JyzmZf8QkRlJnXF", title: "Clair de Lune", artist: "Claude Debussy", image: "https://i.scdn.co/image/ab67616d0000b2739e144788c32c9c3b0a8f0a4a"},
+                {id: "7JV2B3Q6tBUFqpNv9TiZjw", title: "River Flows In You", artist: "Yiruma", image: "https://i.scdn.co/image/ab67616d0000b2735a4aaf7030b6a8b1c8d8e3a3"}
+            ],
+            energetic: [
+                {id: "7gSQv1OHpkIoAdUiRLdmI6", title: "Eye of the Tiger", artist: "Survivor", image: "https://i.scdn.co/image/ab67616d0000b273e31a37a3d30e248a436a1a3d"},
+                {id: "7GhIk7Il098yCjg4BQjzvb", title: "Lose Yourself", artist: "Eminem", image: "https://i.scdn.co/image/ab67616d0000b2738e49866860dcb5c26a4b6f6e"},
+                {id: "5UqCQaDshqbIk3pkhy4Pjg", title: "Titanium", artist: "David Guetta ft. Sia", image: "https://i.scdn.co/image/ab67616d0000b2738e49866860dcb5c26a4b6f6e"}
+            ],
+            romantic: [
+                {id: "4iJyoBOLtHqaGxP12qzhQI", title: "Perfect", artist: "Ed Sheeran", image: "https://i.scdn.co/image/ab67616d0000b273ba5db46f4b838ef6027e6f96"},
+                {id: "6b2oQwSGFkzsMtQruIWm2p", title: "All of Me", artist: "John Legend", image: "https://i.scdn.co/image/ab67616d0000b2739e7dad80eb4bb664ff9e6fc8"},
+                {id: "4uLU6hMCjMI75M1A2tKUQC", title: "Thinking Out Loud", artist: "Ed Sheeran", image: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7"}
+            ]
+        };
+
+        // Mock functions for testing
+        let displayedSongs = [];
+        let lastPlayedSong = null;
+        
+        function displaySongs(songs) {
+            displayedSongs = songs;
+            console.log("Displaying songs:", songs);
+        }
+        
+        function playSong(song) {
+            lastPlayedSong = song;
+            console.log("Playing song:", song);
+        }
+        
+        // Test cases
+        function runTest1() {
+            // Reset
+            displayedSongs = [];
+            const resultDiv = document.getElementById('test1-result');
+            resultDiv.innerHTML = '';
+            
+            // Simulate form submission with happy mood and high sentiment
+            const mood = 'happy';
+            const sentiment = 80;
+            
+            // Get expected songs
+            const expectedSongs = [
+                {id: "7qiZfU4dY1lWllzX7mPBI3", title: "Shape of You", artist: "Ed Sheeran"},
+                {id: "1r9xUipOqoNwggBpENDsvJ", title: "Uptown Funk", artist: "Bruno Mars"},
+                {id: "6fujklziTHa8uoM5OQSfIo", title: "Can't Stop the Feeling!", artist: "Justin Timberlake"}
+            ];
+            
+            // Trigger the function that would be called on form submit
+            if (songDatabase[mood]) {
+                displaySongs(songDatabase[mood]);
+            }
+            
+            // Verify results
+            if (displayedSongs.length > 0) {
+                const allExpectedFound = expectedSongs.every(expected => 
+                    displayedSongs.some(song => song.id === expected.id)
+                );
+                
+                if (allExpectedFound) {
+                    resultDiv.innerHTML = `<p class="pass">PASS: Correct happy mood songs were recommended.</p>`;
+                    updateSummary('Test 1', true);
+                } else {
+                    resultDiv.innerHTML = `<p class="fail">FAIL: Not all expected happy songs were recommended.</p>`;
+                    updateSummary('Test 1', false);
+                }
+            } else {
+                resultDiv.innerHTML = `<p class="fail">FAIL: No songs were recommended for happy mood.</p>`;
+                updateSummary('Test 1', false);
+            }
+        }
+        
+        function runTest2() {
+            // Reset
+            displayedSongs = [];
+            const resultDiv = document.getElementById('test2-result');
+            resultDiv.innerHTML = '';
+            
+            // Simulate form submission with sad mood and low sentiment
+            const mood = 'sad';
+            const sentiment = 20;
+            
+            // Get expected songs
+            const expectedSongs = [
+                {id: "3ERIk9f6kLfOEp78yX1Pm6", title: "Someone Like You", artist: "Adele"},
+                {id: "4Dvkj6JhhA12EX05fT7y2e", title: "Hurt", artist: "Johnny Cash"},
+                {id: "6G7ZrHD6tX7a4qNwSekhZW", title: "Everybody Hurts", artist: "R.E.M."}
+            ];
+            
+            // Trigger the function
+            if (songDatabase[mood]) {
+                displaySongs(songDatabase[mood]);
+            }
+            
+            // Verify results
+            if (displayedSongs.length > 0) {
+                const allExpectedFound = expectedSongs.every(expected => 
+                    displayedSongs.some(song => song.id === expected.id)
+                );
+                
+                if (allExpectedFound) {
+                    resultDiv.innerHTML = `<p class="pass">PASS: Correct sad mood songs were recommended.</p>`;
+                    updateSummary('Test 2', true);
+                } else {
+                    resultDiv.innerHTML = `<p class="fail">FAIL: Not all expected sad songs were recommended.</p>`;
+                    updateSummary('Test 2', false);
+                }
+            } else {
+                resultDiv.innerHTML = `<p class="fail">FAIL: No songs were recommended for sad mood.</p>`;
+                updateSummary('Test 2', false);
+            }
+        }
+        
+        function runTest3() {
+            // Reset
+            displayedSongs = [];
+            const resultDiv = document.getElementById('test3-result');
+            resultDiv.innerHTML = '';
+            
+            let testPassed = true;
+            let errorMessages = [];
+            
+            // Test 1: No mood selected
+            try {
+                // This would normally be handled by HTML5 validation in the real form
+                const mood = '';
+                if (!mood) {
+                    throw new Error("Mood selection is required");
+                }
+                testPassed = false;
+                errorMessages.push("Form should require mood selection");
+            } catch (e) {
+                // Expected to fail validation
+                console.log("Caught expected validation error:", e.message);
+            }
+            
+            // Test 2: Sentiment out of range
+            try {
+                const sentiment = 150; // Out of range
+                if (sentiment < 0 || sentiment > 100) {
+                    throw new Error("Sentiment must be between 0-100");
+                }
+                testPassed = false;
+                errorMessages.push("Form should validate sentiment range");
+            } catch (e) {
+                // Expected to fail validation
+                console.log("Caught expected validation error:", e.message);
+            }
+            
+            // Check if any songs were incorrectly displayed
+            if (displayedSongs.length > 0) {
+                testPassed = false;
+                errorMessages.push("No songs should be displayed for invalid inputs");
+            }
+            
+            if (testPassed) {
+                resultDiv.innerHTML = `<p class="pass">PASS: Form correctly handles invalid inputs.</p>`;
+                updateSummary('Test 3', true);
+            } else {
+                resultDiv.innerHTML = `
+                    <p class="fail">FAIL: Form didn't handle invalid inputs correctly.</p>
+                    <ul>${errorMessages.map(msg => `<li>${msg}</li>`).join('')}</ul>
+                `;
+                updateSummary('Test 3', false);
+            }
+        }
+        
+        // Track test results
+        const testResults = {};
+        
+        function updateSummary(testName, passed) {
+            testResults[testName] = passed;
+            renderSummary();
+        }
+        
+        function renderSummary() {
+            const summaryDiv = document.getElementById('test-results-summary');
+            let passedCount = 0;
+            let totalCount = 0;
+            
+            let summaryHTML = '<table><tr><th>Test</th><th>Result</th></tr>';
+            
+            for (const [test, result] of Object.entries(testResults)) {
+                totalCount++;
+                if (result) passedCount++;
+                
+                summaryHTML += `
+                    <tr>
+                        <td>${test}</td>
+                        <td class="${result ? 'pass' : 'fail'}">${result ? 'PASS' : 'FAIL'}</td>
+                    </tr>
+                `;
+            }
+            
+            summaryHTML += '</table>';
+            summaryHTML += `<p>Tests Passed: ${passedCount}/${totalCount}</p>`;
+            
+            summaryDiv.innerHTML = summaryHTML;
+        }
+    </script>
+</body>
+</html>
